@@ -901,7 +901,7 @@ func (r *HTMLRenderer) writeTOC(w io.Writer, ast *Node) {
 	buf := bytes.Buffer{}
 
 	inHeading := false
-	tocLevel := 0
+	tocLevel := -1
 	headingCount := 0
 
 	ast.Walk(func(node *Node, entering bool) WalkStatus {
@@ -918,9 +918,14 @@ func (r *HTMLRenderer) writeTOC(w io.Writer, ast *Node) {
 					}
 					buf.WriteString("</li>\n\n<li>")
 				} else {
-					for node.Level > tocLevel {
-						tocLevel++
+					if tocLevel == -1 {
+						tocLevel = node.Level
 						buf.WriteString("\n<ul>\n<li>")
+					} else {
+						for node.Level > tocLevel {
+							tocLevel++
+							buf.WriteString("\n<ul>\n<li>")
+						}
 					}
 				}
 
@@ -950,3 +955,4 @@ func (r *HTMLRenderer) writeTOC(w io.Writer, ast *Node) {
 	}
 	r.lastOutputLen = buf.Len()
 }
+
